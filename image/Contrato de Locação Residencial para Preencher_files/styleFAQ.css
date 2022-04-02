@@ -1,0 +1,163 @@
+
+/*Responsive CSS*/
+
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+.slide-up
+{
+	top: 5% !important;
+}
+
+@media (min-width:631px){ 
+	.slide-up
+	{
+		top: 50px !important;
+	}
+}
+
+@media (min-height:900px){ 
+	.slide-up
+	{
+		top: 15% !important;
+	}
+}
+
+
+.slide-down
+{
+    bottom: -700px !important;
+}
+
+body {
+}
+
+ul, li { list-style: none; }
+
+#container {
+  width: 60%;
+  margin: 30px auto;
+  overflow: auto;
+}
+
+h1 {
+  margin-bottom: 20px;
+}
+
+
+
+
+.title {
+	font-family: 'roboto', sans-serif; color: #fff; 
+	margin-bottom: 10px;
+	font-size: 22px;
+	height: 40px;
+	background: #263c56;
+	color: white;
+	text-align: center;
+	padding-top: 15px;
+}
+
+@media (min-width:631px){ 
+	.title {
+		font-size: 28px;
+	}
+}
+    
+	
+.mfp-closeFAQ{
+    color: #fff;
+    background: #1f2f42 url(/imagens/background-close.png) center no-repeat;
+    width: 30px !important;
+    height: 30px;
+    text-indent: -9999px;
+    opacity: 1;
+    border-bottom-left-radius: 5px;
+    top: 0 !important;
+    right: 0 !important;
+    text-align: left !important;
+    border: 0;
+    position: absolute;
+}
+
+.descritivoFAQPagamento{
+	font-size: 12px;
+}
+
+@media (min-width:631px){ 
+	.mfp-closeFAQ{
+		width: 50px !important;
+		height: 50px;
+	}
+	
+	.descritivoFAQPagamento{
+		font-size: 15px;
+		line-height: 20px;
+	}
+}
+
+
+.faq li { padding: 20px;    color: #353535; }
+
+
+.faq li.q {
+  background: #4FC2E;
+  font-size: 1em;
+  border-bottom: 1px #ddd solid;
+  cursor: pointer;
+}
+
+@media (min-width:631px){ 
+	.faq li.q {
+		 font-size: 14px;
+	}
+	@media (min-height:631px){ 
+		.faq li.q {
+		  background: #4FC2E;
+		  font-size: 16px;
+		  border-bottom: 1px #ddd solid;
+		  cursor: pointer;
+		}
+	}
+}
+
+.faq li.a {
+  background: #e0e0d8;
+  display: none;
+  font-size: 1em;
+  line-height: 1em;
+  color:#333;
+}
+
+
+@media (min-width:631px){ 
+	@media (min-height:631px){ 
+		.faq li.a {
+		  background: #e0e0d8;
+		  display: none;
+		  font-size: 16px;
+		  line-height: 17px;
+		  color:#333;
+		}
+	}
+}
+
+.rotate {
+  -moz-transform: rotate(90deg);
+  -webkit-transform: rotate(90deg);
+  transform: rotate(90deg);
+}
+    
+#container { 
+	width: 90%; 
+	top: 50px;
+}	
+	
+@media (min-width:500px) {
+	#container { 
+		top: inherit;
+	}
+}

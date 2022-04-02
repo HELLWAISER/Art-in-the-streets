@@ -1,0 +1,133 @@
+		/* SALVAR DADOS PREENCHIDOS EM SESSAO PARA USAR DEPOIS */
+		function salvarDadosPreenchidos(){
+			div_mostrar = document.getElementById('fundoAguarde');
+			div_mostrar.className = '';
+			div_mostrar = document.getElementById('perguntaSalvaSessao');
+			div_mostrar.className = 'modal-content-salvaSessao';
+			div_mostrar = document.getElementById('dicaSalvaSessao');
+			div_mostrar.className = 'dicaPreenchimento';
+			div_mostrar = document.getElementById('perguntaCarregaSessao');
+			div_mostrar.className = 'modal-content-salvaSessao hideMe';
+		}
+
+		function fecharSalvaSessao(){
+			div_mostrar = document.getElementById('fundoAguarde');
+			div_mostrar.className = 'hideMe';
+			div_mostrar = document.getElementById('perguntaSalvaSessao');
+			div_mostrar.className = 'modal-content-salvaSessao hideMe';
+			div_mostrar = document.getElementById('dicaSalvaSessao');
+			div_mostrar.className = 'dicaPreenchimento hideMe';
+			div_mostrar = document.getElementById('perguntaCarregaSessao');
+			div_mostrar.className = 'modal-content-salvaSessao hideMe';
+		}
+
+		/* RESTAURAR DADOS PREENCHIDOS SESSAO */
+		function carregarDadosPreenchidos(){
+			div_mostrar = document.getElementById('fundoAguarde');
+			div_mostrar.className = '';
+			div_mostrar = document.getElementById('perguntaCarregaSessao');
+			div_mostrar.className = 'modal-content-salvaSessao';
+			div_mostrar = document.getElementById('perguntaSalvaSessao');
+			div_mostrar.className = 'modal-content-salvaSessao hideMe';
+			div_mostrar = document.getElementById('dicaSalvaSessao');
+			div_mostrar.className = 'dicaPreenchimento hideMe';
+		}		
+
+		function validateEmail(email) {
+			var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+			return re.test(email);
+		}		
+
+		function recuperaCodigosAcesso(){
+			var emailBoleto = document.getElementById('emailSessaoCarrega').value;
+			try{
+				emailBoleto = emailBoleto.trim();
+				emailBoleto = emailBoleto.replace(' ', '');
+				emailBoleto = emailBoleto.replace(' ', '');
+				emailBoleto = emailBoleto.replace(' ', '');
+			}catch(err) {
+			}
+			
+			if ( emailBoleto.length < 3 ){
+				swal("Oops...", "Favor preencher um e-mail.", "error");
+			}else if ( !validateEmail(emailBoleto) ){
+				swal("Oops...", "Favor preencher com um e-mail válido.", "error");
+			}else{
+				document.getElementById('loadingPreva').className = 'loadingPreva';
+				div_mostrar = document.getElementById('perguntaCarregaSessao');
+				div_mostrar.className = 'modal-content-aguarde hideMe';	
+				$.ajax({ 	url: document.location.origin + '/restaura_codigos_sessao_usuario.php',
+							data: {emailSessao: emailBoleto},
+							type: 'POST',
+							success: function(output) {
+								document.getElementById('loadingPreva').className = 'loadingPreva hideMe';
+								if ( output == 0 ){
+									div_mostrar = document.getElementById('perguntaCarregaSessao');
+									div_mostrar.className = 'modal-content-aguarde';
+									swal("Oops...", "Não foram encontrados dados para o e-mail informado.", "error");
+								}else{
+									swal({
+									  position: 'top-end',
+									  type: 'success',
+									  title: 'Dados enviados para o e-mail.',
+									  showConfirmButton: false,
+									  timer: 1500
+									});
+									setTimeout(
+										function(){
+											div_mostrar = document.getElementById('perguntaCarregaSessao');
+											div_mostrar.className = 'modal-content-aguarde';	
+									}, 1700);
+								}
+							}
+				});	
+			}
+		}
+		
+		function restaurarSessao(){
+			var emailBoleto = document.getElementById('emailSessaoCarrega').value;
+			try{
+				emailBoleto = emailBoleto.trim();
+				emailBoleto = emailBoleto.replace(' ', '');
+				emailBoleto = emailBoleto.replace(' ', '');
+				emailBoleto = emailBoleto.replace(' ', '');
+			}catch(err) {
+			}
+
+			if ( emailBoleto.length < 3 ){
+				swal("Oops...", "Favor preencher um e-mail.", "error");
+			}else if ( !validateEmail(emailBoleto) ){
+				swal("Oops...", "Favor preencher com um e-mail válido.", "error");
+			}else if ( document.getElementById('senhaSessaoCarrega').value.length < 3 ){
+				swal("Oops...", "Favor preencher uma senha.", "error");
+			}else{
+				document.getElementById('loadingPreva').className = 'loadingPreva';
+				div_mostrar = document.getElementById('perguntaCarregaSessao');
+				div_mostrar.className = 'modal-content-aguarde hideMe';
+				$.ajax({ 	url: document.location.origin + '/restaura_sessao_usuario.php',
+							data: {emailSessao: emailBoleto, senhaSessao: document.getElementById('senhaSessaoCarrega').value},
+							type: 'POST',
+							success: function(output) {
+								document.getElementById('loadingPreva').className = 'loadingPreva hideMe';
+								if ( output == 0 ){
+									div_mostrar = document.getElementById('perguntaCarregaSessao');
+									div_mostrar.className = 'modal-content-aguarde';
+									swal("Oops...", "Dados não encontrados. Por gentileza revise os campos.", "error");
+								}else{
+									swal({
+									  position: 'top-end',
+									  type: 'success',
+									  title: 'Dados carregados com sucesso. Por gentileza aguarde a tela ser recarregada.',
+									  showConfirmButton: false,
+									  timer: 1500
+									});
+									setTimeout(
+										function(){
+											location.href = "https://99contratos.com.br/" + output + "?sessaoCarregada=1";
+									}, 1700);
+								}
+							}
+				});				
+			}
+		}
+	  /* FIM DO SALVAR DADOS PREENCHIDOS EM SESSAO PARA USAR DEPOIS */

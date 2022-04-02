@@ -1,0 +1,1352 @@
+// Registra em log todos erros apresentados por Javascript	
+window.onerror = function(message, url, lineNumber, column, errorObj) {
+	var browser = 'nao detectado';
+	try{	
+		browser = navigator.userAgent;
+		if ( (!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0 ){
+			browser = 'opera';
+		}else if ( typeof InstallTrigger !== 'undefined' ){
+			browser = 'firefox';
+		}else if ( /constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || (typeof safari !== 'undefined' && safari.pushNotification)) ){
+			browser = 'safari';
+		}else if ( /*@cc_on!@*/false || !!document.documentMode ){
+			browser = 'IE';
+		}else if ( browser != 'IE' && !!window.StyleMedia ){
+			browser = 'edge';
+		}else if ( !!window.chrome && !!window.chrome.webstore ){
+			browser = 'chrome';
+		}else if ((browser == 'chrome' || browser == 'opera') && !!window.CSS){
+			browser = 'blink';
+		}
+	}catch(err) {
+	}
+
+	var mensagem = '' +  '_' + message;
+	if ( mensagem.indexOf('getElementsByClassName.ToString') == -1 ){
+		if ( mensagem.indexOf('find variable: clipper') == -1 ){
+			if ( mensagem.indexOf('Client is not defined') == -1 ){
+				if ( mensagem.indexOf('ga is not defined') == -1 ){
+					if ( mensagem.indexOf('pagead2') == -1 ){
+						if ( mensagem.indexOf('adsbygoogle') == -1 ){
+							if ( mensagem.indexOf('Script error.') == -1 ){
+								var endereco = "" + window.location;
+								if (endereco.toLowerCase().indexOf("www.99contratos.com.br") >= 0){								
+									$.ajax({ 	url: document.location.origin + '/manual/registraErroJavascript.php',
+												data: {dados: message + ' url erro: ' + url + ' | linha: ' + lineNumber + ' | Endereco browser: ' + window.location.href + ' | Resolucao: ' + screen.width + 'x' + screen.height + ' | Browser: ' + browser},
+												type: 'POST',
+												success: function(output) {
+										}
+									});
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return true;
+}
+
+function verificaEnterNumericoSemDigito(e, perguntaAtual, proximaPergunta) {
+	if (e.keyCode == 13) {
+		proxima_pergunta(perguntaAtual, proximaPergunta);
+	}
+	if ( e.charCode >= 48 && e.charCode <= 57 ){
+		return true;
+	}else{
+		return false;
+	}
+}
+
+function verificaEnterNumericoComDigito(e, perguntaAtual, proximaPergunta) {
+	if (e.keyCode == 13) {
+		proxima_pergunta(perguntaAtual, proximaPergunta);
+	}
+	if ( e.charCode == 46 || e.charCode == 44 || (e.charCode >= 48 && e.charCode <= 57 ) ){
+		return true;
+	}else{
+		return false;
+	}
+}
+
+function verificaNumericoConcluir(e) {
+	if ( e.charCode == 46 || e.charCode == 44 || (e.charCode >= 48 && e.charCode <= 57 ) ){
+		return true;
+	}
+	if (e.keyCode == 13) {
+		concluirContrato();
+	}
+}			
+
+function varificaLinhasTextArea(areaId) {
+	var inTxt = document.getElementById(areaId).value;
+	var numberOfLineBreaks = (inTxt.match(/\n/g)||[]).length;
+	var characterCount = inTxt.length + numberOfLineBreaks;
+	document.getElementById(areaId).rows = numberOfLineBreaks + 2;
+	var stringInputada = document.getElementById(areaId).value;
+	if (stringInputada.indexOf("______") !=-1) {
+		document.getElementById(areaId).value = '';
+		alteraTamanhoInput(areaId);
+	}
+}
+
+function verificaTextoVazio(areaId){
+	var inTxt = document.getElementById(areaId).value.trim();
+	if ( inTxt.length < 1 ){
+		document.getElementById(areaId).value = '___________________';
+	}
+}
+
+function verificaVazio(idInput) {
+	var stringInputada = document.getElementById(idInput).value;
+	if (stringInputada.indexOf("______") !=-1) {
+		document.getElementById(idInput).value = '';
+		alteraTamanhoInput(idInput);
+	}
+}
+
+function verificaVazioNegrito(idInput) {
+
+	var stringInputada = document.getElementById(idInput).value;	
+	if (stringInputada.indexOf("______") !=-1) {
+		document.getElementById(idInput).value = '';
+		alteraTamanhoInputNegrito(idInput);
+	}	
+}
+
+function alteraTamanhoInput(idInput) {
+	var stringInputada = document.getElementById(idInput).value;
+
+	if ( stringInputada.length < 1 ){
+		var stringPlaceHolder = document.getElementById(idInput).placeholder;
+		var tamanhoInput = retornaTamanhoStringPixels(stringPlaceHolder, idInput);
+		if (document.getElementById(idInput).className == 'textAreaPrevia' ){
+			document.getElementById(idInput).style.width = '100%';
+		}else{
+			document.getElementById(idInput).style.width = tamanhoInput;
+		}
+	}else{	
+		var tamanhoInput = retornaTamanhoStringPixels(stringInputada, idInput);
+		if (document.getElementById(idInput).className == 'textAreaPrevia' ){
+			document.getElementById(idInput).style.width = '100%';
+		}else{
+			document.getElementById(idInput).style.width = tamanhoInput + 2;
+		}
+	}
+}
+
+function alteraTamanhoInputNegrito(idInput) {
+
+	var stringInputada = document.getElementById(idInput).value;
+
+	if ( stringInputada.length < 1 ){
+		var stringPlaceHolder = document.getElementById(idInput).placeholder;
+		var tamanhoInput = retornaTamanhoStringNegritoPixels(stringPlaceHolder, idInput);
+		document.getElementById(idInput).style.width = tamanhoInput;
+	}else{	
+		var tamanhoInput = retornaTamanhoStringNegritoPixels(stringInputada, idInput);
+		document.getElementById(idInput).style.width = tamanhoInput + 2;
+	}	
+}	
+
+function verificaInput(idInput) {
+	if ( document.getElementById(idInput).value.length < 1 ){
+		var tamanhoInput = retornaTamanhoStringPixels('___________________________________', idInput);
+		if (document.getElementById(idInput).className == 'textAreaPrevia' ){
+			document.getElementById(idInput).style.width = '100%';
+		}else{
+			document.getElementById(idInput).style.width = tamanhoInput;
+		}
+		document.getElementById(idInput).value = '___________________';		
+	}else if ( document.getElementById(idInput).value == document.getElementById(idInput).placeholder ){
+		var tamanhoInput = retornaTamanhoStringPixels('___________________________________', idInput);
+		if (document.getElementById(idInput).className == 'textAreaPrevia' ){
+			document.getElementById(idInput).style.width = '100%';
+		}else{		
+			document.getElementById(idInput).style.width = tamanhoInput;
+		}
+		document.getElementById(idInput).value = '___________________';
+	}
+}
+
+function verificaInputNegrito(idInput) {
+	if ( document.getElementById(idInput).value.length < 1 ){
+		var tamanhoInput = retornaTamanhoStringNegritoPixels('___________________________________', idInput);
+		document.getElementById(idInput).style.width = tamanhoInput;
+		document.getElementById(idInput).value = '___________________';		
+	}else if ( document.getElementById(idInput).value == document.getElementById(idInput).placeholder ){
+		var tamanhoInput = retornaTamanhoStringNegritoPixels('___________________________________', idInput);
+		document.getElementById(idInput).style.width = tamanhoInput;
+		document.getElementById(idInput).value = '___________________';
+	}
+}
+
+function verificaEnter(e, perguntaAtual, proximaPergunta) {
+	if (e.keyCode == 13) {
+		proxima_pergunta(perguntaAtual, proximaPergunta);
+	}
+}
+
+function verificaEnterConta(e, campoAtual) {
+	if (e.keyCode == 13) {
+		if ( campoAtual == 'bancoLocador' ){
+			document.getElementById("agenciaLocador").focus();
+		}else{
+			document.getElementById("contaLocador").focus();
+		}
+	}
+}
+
+function verificaEnterContaVenda(e, campoAtual) {
+	if (e.keyCode == 13) {
+		if ( campoAtual == 'bancoLocador' ){
+			document.getElementById("agenciaVendedor").focus();
+		}else{
+			document.getElementById("contaVendedor").focus();
+		}
+	}
+}
+
+function close_modal() {
+	var modal = document.getElementById('myModal');
+	modal.style.display = "none";
+	try{
+		document.getElementById("dicaPergunta").className = "dicaPergunta hideMe";
+	}catch(err) {
+	}
+	try{
+		document.getElementById("dicaPreenchimento").className = "dicaPreenchimento hideMe";
+	}catch(err) {
+	}
+	try{
+		document.getElementById("iconeSalvarSessao").className = "verPrevia hideMe";
+	}catch(err) {
+	}
+	try{
+		document.getElementById("iconeRestaurarSessao").className = "editarPrevia hideMe";
+	}catch(err) {
+	}
+	try{
+		document.getElementById("informacoesPreenchimento").className = "dicaPreenchimento hideMe";
+	}catch(err) {
+	}
+	
+	try{
+		var hidden = $('.hidden');
+		hidden.animate({"top":"90px"}, "slow").removeClass('visible');
+		document.getElementById("previaApresentacao").className = "hidden hideMe";
+	}catch(err) {
+	}
+	
+	try{
+		// Somente retira o botao de ver previa se fechou o modal manualmente
+		if ( document.getElementById('loadingPreva').className == '' ){
+		}else{
+			document.getElementById("slide").className = "botaoVerPrevia hideMe";
+		}
+	}catch(err) {
+	}
+}
+
+function close_modal_descritivo() {
+	var modal = document.getElementById('modalDescritivo');
+	modal.style.display = "none";
+}
+
+
+
+
+function proxima_pergunta_garantia(pergunta_atual) {
+	var garantia_escolhida = document.getElementById('garantia_escolhida_var').value;
+	if ( garantia_escolhida == 'fiador'){
+		proxima_pergunta(pergunta_atual, 'perguntaFiador1');
+	}else if ( garantia_escolhida == 'seguro'){
+		proxima_pergunta(pergunta_atual, 'perguntaSeguro2');
+	}else if ( garantia_escolhida == 'dinheiro'){
+		proxima_pergunta(pergunta_atual, 'perguntaGarantiaCaucao');
+	}else if ( garantia_escolhida == 'bem_movel'){
+		proxima_pergunta(pergunta_atual, 'perguntaGarantiaCaucaoBem');
+	}else if ( garantia_escolhida == 'titulos'){
+		proxima_pergunta(pergunta_atual, 'perguntaGarantiaTitulo');
+	}else if ( garantia_escolhida == 'aluguel'){
+		proxima_pergunta(pergunta_atual, 'perguntaGarantiaAluguel');
+	}else if ( garantia_escolhida == 'imovel'){
+		proxima_pergunta(pergunta_atual, 'perguntaGarantiaCaucaoImovel');
+	}else{
+		proxima_pergunta(pergunta_atual, 'perguntaGarantiaCaucao');
+	}
+}
+
+
+function proxima_pergunta_garantia_com_seguradora(pergunta_atual) {
+	var garantia_escolhida = document.getElementById('garantia_escolhida_var').value;
+	if ( garantia_escolhida == 'fiador'){
+		proxima_pergunta(pergunta_atual, 'perguntaFiador1');
+	}else if ( garantia_escolhida == 'seguro'){
+		proxima_pergunta(pergunta_atual, 'perguntaSeguro1');
+	}else if ( garantia_escolhida == 'dinheiro'){
+		proxima_pergunta(pergunta_atual, 'perguntaGarantiaCaucao');
+	}else if ( garantia_escolhida == 'bem_movel'){
+		proxima_pergunta(pergunta_atual, 'perguntaGarantiaCaucaoBem');
+	}else if ( garantia_escolhida == 'titulos'){
+		proxima_pergunta(pergunta_atual, 'perguntaGarantiaTitulo');
+	}else if ( garantia_escolhida == 'aluguel'){
+		proxima_pergunta(pergunta_atual, 'perguntaGarantiaAluguel');
+	}else if ( garantia_escolhida == 'imovel'){
+		proxima_pergunta(pergunta_atual, 'perguntaGarantiaCaucaoImovel');
+	}
+}
+
+
+function proxima_pergunta(pergunta_esconder, proxima_pergunta) {
+	try{
+		document.getElementById("dicaPergunta").className = "dicaPergunta hideMe";
+	}catch(err) {
+	}
+	try{
+		document.getElementById("dicaPreenchimento").className = "dicaPreenchimento hideMe";
+	}catch(err) {
+	}	
+	try{
+		document.getElementById("informacoesPreenchimento").className = "dicaPreenchimento hideMe";
+	}catch(err) {
+	}
+	
+	try{
+		var div_esconder = document.getElementById(pergunta_esconder);
+		var div_mostrar = document.getElementById(proxima_pergunta);
+		div_esconder.className = 'modal-content hideMe';
+		div_mostrar.className = 'modal-content-rapido';
+	
+		arvorePerguntas[perguntasFeitas] = pergunta_esconder;
+		perguntasFeitas = perguntasFeitas + 1;
+	
+		var targetDiv = document.getElementById(proxima_pergunta).getElementsByClassName("inputPerguntas")[0];
+		if ( targetDiv != undefined ){
+			if ( window.innerWidth < 600 ){
+			}else if ( window.innerWidth < window.innerHeight ){				
+			}else{
+				targetDiv.focus();
+			}
+		}
+		targetDiv = document.getElementById(proxima_pergunta).getElementsByClassName("inputEndereco")[0];
+		if ( targetDiv != undefined ){
+			if ( window.innerWidth < 600 ){
+			}else if ( window.innerWidth < window.innerHeight ){				
+			}else{
+				targetDiv.focus();
+			}
+		}
+	}catch(err) {
+	}
+
+	// Para não modificar o Array original
+	var arr_temporario = arvorePerguntas.slice().sort();
+	var results = [];
+	for (var i = 0; i < arr_temporario.length - 1; i++) {
+		if (arr_temporario[i] == proxima_pergunta) {
+			// Grava em arquivo TXT o erro / nomes dos modais e manda email para mim
+			$.ajax({ 	url: document.location.origin + '/manual/registraErroPerguntaDuplicada.php',
+						data: {pergunta: arr_temporario[i], arvore: arvorePerguntas, tipoContrato: window.location.href},
+						type: 'POST',
+						success: function(output) {
+						}
+			});
+			// Grava uma linha somente
+			i = arr_temporario.length + 1;
+		}
+		// Para tirar todas as perguntas abertas, somente mantendo a pergunta atual, 
+		// evitando assim definitivamente ter 2 modais abertos.
+		div_esconder = document.getElementById(arr_temporario[i]);
+		div_esconder.className = 'modal-content hideMe';
+	}
+
+
+	try{
+		verificaDicaPergunta(proxima_pergunta);
+	}catch(err) {
+	}
+	
+	
+	var cusid_ele = document.getElementsByClassName('modal-content-rapido');
+	var modalsAbertos = 0;
+	var ultimaPergunta = '';
+	
+	for (var i = 0; i < cusid_ele.length; ++i) {
+		var item = cusid_ele[i];  
+		if ( item.className.indexOf('hideMe') !== -1 ){
+		}else{
+			modalsAbertos = modalsAbertos + 1;
+			ultimaPergunta = item.id;
+		}
+	}
+	
+	cusid_ele = document.getElementsByClassName('modal-content');
+	for (var i = 0; i < cusid_ele.length; ++i) {
+		var item = cusid_ele[i];  
+		if ( item.className.indexOf('hideMe') !== -1 ){
+		}else{
+			modalsAbertos = modalsAbertos + 1;
+			ultimaPergunta = item.id;
+		}
+	}
+	
+	if ( modalsAbertos > 1 ){
+		// Grava em arquivo TXT o erro / nomes dos modais e manda email para mim
+		$.ajax({ 	url: document.location.origin + '/manual/registraErroModal.php',
+					data: {pergunta: ultimaPergunta, tipoContrato: window.location.href},
+					type: 'POST',
+					success: function(output) {
+			}
+		});
+	}
+
+
+	if ( modalsAbertos < 1 ){
+		// Grava em arquivo TXT o erro / nomes dos modais e manda email para mim
+		$.ajax({ 	url: document.location.origin + '/manual/registraErroSemModal.php',
+					data: {pergunta: pergunta_esconder, pergunta2: proxima_pergunta, tipoContrato: window.location.href},
+					type: 'POST',
+					success: function(output) {
+						swal("Oops...", "Ocorreu um erro ao abrir a próxima pergunta. Um e-mail foi enviado para o nosso time técnico.", "error");
+					}
+		});
+	}	
+	
+}
+
+
+function pergunta_anterior(pergunta_esconder) {
+	
+	try{
+		document.getElementById("dicaPergunta").className = "dicaPergunta hideMe";
+	}catch(err) {
+	}
+	try{
+		document.getElementById("informacoesPreenchimento").className = "dicaPreenchimento hideMe";
+	}catch(err) {
+	}	
+	try{
+		var perguntaAnterior = arvorePerguntas[perguntasFeitas-1];
+		perguntasFeitas = perguntasFeitas - 1;
+
+		
+		try{
+			var perguntaRemover = arvorePerguntas.indexOf(pergunta_esconder);
+			if ( perguntaRemover != -1 ){
+				arvorePerguntas.splice(perguntaRemover, 1);
+			}
+		}catch(err) {
+		}
+
+		var div_esconder = document.getElementById(pergunta_esconder);
+		var div_mostrar = document.getElementById(perguntaAnterior);
+		div_esconder.className = 'modal-content hideMe';
+		div_mostrar.className = 'modal-content-rapido';
+	
+		try{
+			verificaDicaPergunta(perguntaAnterior);
+		}catch(err) {
+		}
+	
+	
+		var targetDiv = document.getElementById(perguntaAnterior).getElementsByClassName("inputPerguntas")[0];
+		if ( targetDiv != undefined ){
+			if ( window.innerWidth < 600 ){
+			}else if ( window.innerWidth < window.innerHeight ){				
+			}else{
+				targetDiv.focus();
+			}
+		}
+		targetDiv = document.getElementById(perguntaAnterior).getElementsByClassName("inputEndereco")[0];
+		if ( targetDiv != undefined ){
+			if ( window.innerWidth < 600 ){
+			}else if ( window.innerWidth < window.innerHeight ){				
+			}else{
+				targetDiv.focus();
+			}
+		}
+		//setTimeout(window.scrollTo(0,0),100);
+	}catch(err) {
+	}
+	
+	var cusid_ele = document.getElementsByClassName('modal-content-rapido');
+	var modalsAbertos = 0;
+	var ultimaPergunta = '';
+	
+	for (var i = 0; i < cusid_ele.length; ++i) {
+		var item = cusid_ele[i];  
+		if ( item.className.indexOf('hideMe') !== -1 ){
+		}else{
+			modalsAbertos = modalsAbertos + 1;
+			ultimaPergunta = item.id;
+		}
+	}
+	
+	cusid_ele = document.getElementsByClassName('modal-content');
+	for (var i = 0; i < cusid_ele.length; ++i) {
+		var item = cusid_ele[i];  
+		if ( item.className.indexOf('hideMe') !== -1 ){
+		}else{
+			modalsAbertos = modalsAbertos + 1;
+			ultimaPergunta = item.id;
+		}
+	}
+	
+	if ( modalsAbertos > 1 ){
+		// Grava em arquivo TXT o erro / nomes dos modais e manda email para mim
+		$.ajax({ 	url: document.location.origin + '/manual/registraErroModal.php',
+					data: {pergunta: ultimaPergunta, tipoContrato: window.location.href},
+					type: 'POST',
+					success: function(output) {
+			}
+		});
+	}
+	
+	
+	if ( modalsAbertos < 1 ){
+		$.ajax({ 	url: document.location.origin + '/manual/registraErroSemModal.php',
+					data: {pergunta: pergunta_esconder, pergunta2: 'clicou voltar', tipoContrato: window.location.href},
+					type: 'POST',
+					success: function(output) {
+						swal("Oops...", "Ocorreu um erro ao abrir a próxima pergunta. Um e-mail foi enviado para o nosso time técnico.", "error");
+					}
+		});
+	}		
+}
+
+
+
+
+function verificaDicaPergunta(proximaPergunta){
+	var dica = perguntas.indexOf(proximaPergunta);
+	if ( dica < 0 ){
+	}else{
+		dica = dicas[dica];
+		// Verificar o tamanho da pergunta, se for maior que X caracteres muda a classe, para apresentar abaixo ou acima - Alinhar com o campo da pergunta
+		// Ser mais fino também dependendo da largura?
+		document.getElementById("dicaPergunta").className = "dicaPergunta";
+		document.getElementById('textoDicaPergunta').innerText = dica;
+		document.getElementById('pDicaPergunta').style.height = '';
+	}
+
+	try{
+		if ( screen.height < screen.width ){
+			var posicao = posicoesPerguntas.indexOf(proximaPergunta);
+			if ( posicao < 0 ){
+			}else{
+				var offset = -200;
+				posicao = posicoesPrevia[posicao];
+				$('html, body').animate({
+					scrollTop: $("#" + posicao).offset().top + offset
+				}, 1000);
+			}
+		}
+	}catch(err){
+	}
+}
+
+function retornaBotaoPrevia(){
+	setTimeout(function(){
+		document.getElementById('botaoPrevia').className = 'modal-content-previa';
+	}, 2000);
+}
+
+function concluirContrato(){
+	try{
+		document.getElementById('slide').className = 'hideMe';
+	}catch(err) {
+	}
+	try{
+		document.getElementById('botaoPrevia').className = 'hideMe';
+	}catch(err) {
+	}
+	try{
+		document.getElementById('descricaoContrato').className = 'hideMe';
+	}catch(err) {
+	}
+	try{
+		document.getElementById('slideFAQ').className = 'hideMe';
+	}catch(err) {
+	}
+	try{
+		document.getElementById('perguntaCPFTestemunha2').className = 'hideMe';
+	}catch(err) {
+	}	
+	try{
+		aguardePagSeguro();
+	}catch(err) {
+	}	
+	document.getElementById('submeter').value = "concluido";
+	document.forms["myForm"].submit();
+}
+
+function validateEmail(email) {
+    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(email);
+}
+
+function preencheEmailReajuste(element){
+	try{
+		document.getElementById('emailLembreteReajuste').value = element.value;
+	}catch(err) {
+	}
+}
+
+function focusFinal(id){
+	if ( window.innerWidth < 600 ){
+		setTimeout(function(){
+			id = '#' + id;
+			var mascara = $(id).val();
+			$(id).focus().val("").val(mascara);
+		}, 300);
+	}
+}
+
+function updateViews() {
+	if (is_keyboard) {
+		var x = document.getElementsByClassName("botaoAnterior");
+		var i;
+		for (i = 0; i < x.length; i++) {
+			x[i].style.display = 'none';
+		}
+		x = document.getElementsByClassName("percentual");
+		for (i = 0; i < x.length; i++) {
+			x[i].style.display = 'none';
+		}
+		x = document.getElementsByClassName("modal-observacao");
+		for (i = 0; i < x.length; i++) {
+			x[i].style.display = 'none';
+		}
+		x = document.getElementsByClassName("divisaoModal");
+		for (i = 0; i < x.length; i++) {
+			x[i].style.display = 'none';
+		}
+		x = document.getElementsByClassName("botaoDuvidas");
+		for (i = 0; i < x.length; i++) {
+			x[i].style.display = 'none';
+		}
+		x = document.getElementsByClassName("botaoPreviaEdicao");
+		for (i = 0; i < x.length; i++) {
+			x[i].style.display = 'none';
+		}
+		try{
+			if ( document.getElementById("myModal").style.display == 'block' ){
+				document.getElementById('slide').className = 'hideMe';
+			}
+		}catch(err) {
+		}
+		try{
+			document.getElementById('LogoMobile').className = 'hideMe';
+		}catch(err) {
+		}
+		try{
+			x = document.getElementsByClassName("botaoVerPrevia");
+			for (i = 0; i < x.length; i++) {
+				x[i].className = 'botaoVerPrevia rwd-break-small-screen hideMe';
+			}
+		}catch(err) {
+		}
+		try{
+			document.getElementById('mfesecure-ts-image').className = 'hideMe';
+		}catch(err) {
+		}
+		try{
+			document.getElementById('atendimentoWhatsapp').className = 'hideMe';
+		}catch(err) {
+		}
+		try{
+			document.getElementById('retractableMenuMobile').className = 'hideMe';
+		}catch(err) {
+		}
+	}else {
+		var x = document.getElementsByClassName("botaoAnterior");
+		var i;
+		for (i = 0; i < x.length; i++) {
+			x[i].style.display = 'inline-block';
+		}
+		x = document.getElementsByClassName("percentual");
+		for (i = 0; i < x.length; i++) {
+			x[i].style.display = 'inline-block';
+		}
+		x = document.getElementsByClassName("modal-observacao");
+		for (i = 0; i < x.length; i++) {
+			x[i].style.display = 'inline-block';
+		}
+		x = document.getElementsByClassName("divisaoModal");
+		for (i = 0; i < x.length; i++) {
+			x[i].style.display = 'block';
+		}
+		x = document.getElementsByClassName("botaoDuvidas");
+		for (i = 0; i < x.length; i++) {
+			x[i].style.display = 'block';
+		}
+		x = document.getElementsByClassName("botaoPreviaEdicao");
+		for (i = 0; i < x.length; i++) {
+			x[i].style.display = 'block';
+		}
+		try{
+			if ( document.getElementById("myModal").style.display == 'block' ){
+				document.getElementById('slide').className = 'botaoVerPrevia';
+			}
+		}catch(err) {
+		}
+		try{
+			if ( document.getElementById("myModal").style.display == 'block' ){
+				x = document.getElementsByClassName("botaoVerPrevia");
+				for (i = 0; i < x.length; i++) {
+					x[i].className = 'botaoVerPrevia rwd-break-small-screen';
+				}
+			}
+		}catch(err) {
+		}
+		try{
+			document.getElementById('LogoMobile').className = 'divLogo';
+		}catch(err) {
+		}		
+		try{
+			document.getElementById('mfesecure-ts-image').className = '';
+		}catch(err) {
+		}
+		try{
+			document.getElementById('atendimentoWhatsapp').className = '';
+		}catch(err) {
+		}
+		try{
+			document.getElementById('retractableMenuMobile').className = '';
+		}catch(err) {
+		}
+	}
+}
+
+
+
+function updateViewsAndroid() {
+	if (is_keyboard) {
+		var x = document.getElementsByClassName("enterMobileEsconderEdicao");
+		var i;
+		for (i = 0; i < x.length; i++) {
+			if ( window.innerHeight < 300 ){
+				x[i].className = 'enterMobileEsconderEdicao hideMe';
+			}else{
+				x[i].className = 'enterMobileEsconderEdicao';
+			}
+		}
+
+		x = document.getElementsByClassName("textoMobileDiminuirEdicao");
+		var i;
+		for (i = 0; i < x.length; i++) {
+			if ( window.innerHeight < 300 ){
+				x[i].style.fontSize = '12px';
+			}else{
+				x[i].style.fontSize = '15px';
+			}
+		}
+
+		x = document.getElementsByClassName("modal-header");
+		var i;
+		for (i = 0; i < x.length; i++) {
+			x[i].style.height = '15%';
+		}
+
+		x = document.getElementsByClassName("modal-observacao");
+		var i;
+		for (i = 0; i < x.length; i++) {
+			x[i].style.bottom = '0%';
+		}
+
+		x = document.getElementsByClassName("modal-footer");
+		var i;
+		for (i = 0; i < x.length; i++) {
+			x[i].style.height = '0px';
+		}		
+
+		x = document.getElementsByClassName("inputEndereco");
+		var i;
+		for (i = 0; i < x.length; i++) {
+			// Galaxy Note tem 350 quando com textarea aberto
+			if ( window.innerHeight < 300 ){
+				x[i].style.height = '90px';
+			}else{
+				x[i].style.height = '110px';
+			}
+		}
+		
+		x = document.getElementsByClassName("modal");
+		for (i = 0; i < x.length; i++) {
+			x[i].style.paddingTop = '0px';
+		}
+		x = document.getElementsByClassName("modal-content-rapido");
+		for (i = 0; i < x.length; i++) {
+			x[i].style.height = '100%';
+			x[i].style.top = '0%';
+		}
+		x = document.getElementsByClassName("modal-content");
+		for (i = 0; i < x.length; i++) {
+			x[i].style.height = '100%';
+		}
+		try{
+			if ( document.getElementById("myModal").style.display == 'block' ){
+				document.getElementById('slide').className = 'hideMe';
+			}
+		}catch(err) {
+		}
+		try{
+			x = document.getElementsByClassName("botaoVerPrevia");
+			for (i = 0; i < x.length; i++) {
+				x[i].className = 'botaoVerPrevia rwd-break-small-screen hideMe';
+			}
+		}catch(err) {
+		}
+		try{
+			document.getElementById('mfesecure-ts-image').className = 'hideMe';
+		}catch(err) {
+		}		
+	}else {
+		var x = document.getElementsByClassName("enterMobileEsconderEdicao");
+		var i;
+		for (i = 0; i < x.length; i++) {
+			x[i].className = 'enterMobileEsconderEdicao';
+		}
+		x = document.getElementsByClassName("textoMobileDiminuirEdicao");
+		var i;
+		for (i = 0; i < x.length; i++) {
+			if ( window.innerHeight < 660 ){
+				x[i].style.fontSize = '14px';
+			}else{
+				x[i].style.fontSize = '15px';
+			}
+		}
+		
+		x = document.getElementsByClassName("modal-header");
+		var i;
+		for (i = 0; i < x.length; i++) {
+			if ( window.innerHeight < 550 ){
+				x[i].style.height = '60px';
+			}else if ( window.innerHeight < 550 ){
+				x[i].style.height = '80px';
+			}else{
+				x[i].style.height = '100px';
+			}
+		}
+		
+		x = document.getElementsByClassName("modal-observacao");
+		var i;
+		for (i = 0; i < x.length; i++) {
+			if ( window.innerHeight > 630 ){
+				x[i].style.bottom = '23%';
+				x[i].style.display = 'block';
+			}else{
+				x[i].style.display = 'none';
+			}
+		}
+		
+		x = document.getElementsByClassName("modal-footer");
+		var i;
+		for (i = 0; i < x.length; i++) {
+			if ( window.innerHeight > 600 ){
+				x[i].style.height = '22%';
+			}else{
+				x[i].style.height = '90px';
+			}
+		}		
+		
+		x = document.getElementsByClassName("inputEndereco");
+		var i;
+		for (i = 0; i < x.length; i++) {
+			x[i].style.height = '120px';
+		}
+		
+		x = document.getElementsByClassName("modal");
+		for (i = 0; i < x.length; i++) {
+			//x[i].style.paddingTop = '80px';
+		}
+		x = document.getElementsByClassName("modal-content-rapido");
+		for (i = 0; i < x.length; i++) {
+			x[i].style.height = '90%';
+			x[i].style.top = '10%';
+		}
+		x = document.getElementsByClassName("modal-content");
+		for (i = 0; i < x.length; i++) {
+			x[i].style.height = '90%';
+		}
+		try{
+			if ( document.getElementById("myModal").style.display == 'block' ){
+				document.getElementById('slide').className = 'botaoVerPrevia';
+			}
+		}catch(err) {
+		}
+		try{
+			if ( document.getElementById("myModal").style.display == 'block' ){
+				x = document.getElementsByClassName("botaoVerPrevia");
+				for (i = 0; i < x.length; i++) {
+					x[i].className = 'botaoVerPrevia rwd-break-small-screen';
+				}
+			}
+		}catch(err) {
+		}
+		try{
+			document.getElementById('mfesecure-ts-image').className = '';
+		}catch(err) {
+		}		
+	}
+}
+
+	var perguntasCarregadas = new Array();
+	var perguntasCarregadasContador = 0;	
+	var jaCarregado = false;
+	
+	function adicionaFormularioPerguntas(perguntaAnterior, proximaPergunta, nomeArquivoPerguntas)
+	{	
+		try{
+			if ( screen.height < screen.width ){
+				document.getElementById('small-loading').innerHTML = '<img id="small-loading" src="https://www.99contratos.com.br/imagens/loading-perguntas.gif" alt="Logotipo" style="width: 30px; display:  inline-block; position:  absolute; bottom: 20%; right: 10%;">';
+			}else{
+				document.getElementById('small-loading').innerHTML = '<img id="small-loading" src="https://www.99contratos.com.br/imagens/loading-perguntas.gif" alt="Logotipo" style="width: 30px; display:  inline-block; position:  absolute; bottom: 30%; right: 10%;">';
+			}
+		}catch(err) {
+		}
+					
+		jaCarregado = false;
+		for (var i = 0; i < perguntasCarregadas.length; i++) {
+			if (perguntasCarregadas[i] == nomeArquivoPerguntas) {	
+			    jaCarregado = true;
+			}
+		}
+	
+		if ( ! jaCarregado ){
+			perguntasCarregadas[perguntasCarregadasContador] = nomeArquivoPerguntas;
+			perguntasCarregadasContador = perguntasCarregadasContador + 1;	
+			jQuery.ajax({
+				url: document.location.origin + "/perguntas/" + nomeArquivoPerguntas,
+				data:'',
+				type: "POST",
+				success:function(data){
+					var formularioPeguntas = document.getElementById('myModal');
+					formularioPeguntas.innerHTML += data;
+
+					// Combos
+					var cusid_ele = document.getElementsByClassName('wrapper-dropdown-3');
+					for (var i = 0; i < cusid_ele.length; ++i) {
+						var item = cusid_ele[i];  
+						var nome = "#" + item.id;
+						var dd = new DropDown( $("#"+item.id) );
+						$(document).click(function() {
+							// all dropdowns
+							$('.wrapper-dropdown-3').removeClass('active');
+						});
+					}
+
+					// Máscaras
+					// CPF
+					cusid_ele = document.getElementsByClassName('inputPerguntas');
+					for (var i = 0; i < cusid_ele.length; ++i) {
+						var item = cusid_ele[i];  
+						// CPF
+						if ( item.id.indexOf("CPF") !=-1) {
+							try{
+								$("#"+item.id).mask("999.999.999-99",{placeholder:" "});
+							}catch(err) {
+							}
+						}
+						// CPF
+						if ( item.id.indexOf("cpf") !=-1) {
+							try{
+								$("#"+item.id).mask("999.999.999-99",{placeholder:" "});
+							}catch(err) {
+							}
+						}
+						// CNPJ
+						if ( item.id.indexOf("CNPJ") !=-1) {
+							try{
+								$("#"+item.id).mask("99.999.999/9999-99",{placeholder:" "});
+							}catch(err) {
+							}
+						}
+						// HORA
+						if ( item.id.indexOf("horaInput") !=-1) {
+							try{
+								$("#"+item.id).mask("99:99",{placeholder:" "});
+							}catch(err) {
+							}
+						}
+						// DATA
+						if ( item.id.indexOf("data") !=-1) {
+							// Não pegar dados do comodatário (comodato)
+							if ( item.id.indexOf("Comodatario") ==-1){
+								if ( item.id.indexOf("datasPagamento") ==-1){
+									// Não pegar dados do arrendatario (Arrendamento rural)
+									if ( item.id.indexOf("rrendatario") ==-1){
+										// Todos input de data estão como numéricos
+										if ( item.type == "tel") {
+											try{
+												$("#"+item.id).mask("99/99/9999",{placeholder:" "});
+											}catch(err) {
+											}
+										}
+									}
+								}
+							}
+						}
+						// PLACA VEÍCULO
+						if ( item.id.indexOf("placaVeiculo") !=-1) {
+							try{
+								$("#"+item.id).mask("aaa9**9",{placeholder:" "});
+							}catch(err) {
+							}
+						}
+						
+						// VALOR
+						if ( window.innerWidth > 600 ){
+							try{
+								if ( item.id.indexOf("valor") !=-1) {
+									$("#"+item.id).maskMoney({thousands:'.',decimal:','});
+								}
+								if ( item.id.indexOf("salario") !=-1) {
+									$("#"+item.id).maskMoney({thousands:'.',decimal:','});
+								}
+								// ALGUMAS MULTAS NAO TEM DECIMAL!
+								var endereco = "" + window.location;
+								if ( endereco.toLowerCase().indexOf("contrato-locacao-residencial")  > 0){
+								}else if ( endereco.toLowerCase().indexOf("contrato-locacao-comercial")  > 0){
+								}else if ( endereco.toLowerCase().indexOf("contrato-locacao-vaga-garagem")  > 0){
+								}else if ( endereco.toLowerCase().indexOf("contrato-locacao-veiculo")  > 0){
+								}else if ( endereco.toLowerCase().indexOf("contrato-arrendamento-rural")  > 0){
+								}else if ( endereco.toLowerCase().indexOf("contrato-compra-e-venda-imovel-gaveta")  > 0){
+								}else if ( endereco.toLowerCase().indexOf("contrato-locacao-bem-movel")  > 0){
+								}else if ( endereco.toLowerCase().indexOf("contrato-prestacao-servico-pf")  > 0){
+								}else if ( endereco.toLowerCase().indexOf("contrato-promessa-compra-venda")  > 0){
+								}else if ( endereco.toLowerCase().indexOf("contrato-promessa-compra-e-venda-imovel")  > 0){
+								}else if ( endereco.toLowerCase().indexOf("contrato-promessa-compra-e-venda-terreno")  > 0){
+								}else if ( endereco.toLowerCase().indexOf("contrato-salao-parceiro")  > 0){
+								}else if ( endereco.toLowerCase().indexOf("contrato-empreitada")  > 0){
+								}else if ( endereco.toLowerCase().indexOf("contrato-compra-venda-veiculo")  > 0){
+								}else if ( endereco.toLowerCase().indexOf("contrato-compra-venda-estabelecimento-comercial")  > 0){
+								}else{
+									if ( item.id.indexOf("multa") !=-1) {
+										$("#"+item.id).maskMoney({thousands:'.',decimal:','});
+									}
+								}
+							}catch(err) {
+							}
+						}
+					}
+					try{
+						document.getElementById('perguntaDesabilitar1').style.pointerEvents = 'auto';
+						document.getElementById('perguntaDesabilitar2').style.pointerEvents = 'auto';
+					}catch(err) {
+					}
+					try{
+						document.getElementById('small-loading').innerHTML = '';
+					}catch(err) {
+					}
+					
+					try{
+						var percentuais = document.getElementsByClassName('percentual');
+						for (var i = 0; i < percentuais.length; ++i) {
+							var item = percentuais[i]; 
+							var texto = item.innerHTML;
+							if ( item.innerHTML.indexOf('Progresso:') == -1 ){
+								item.innerHTML = '<span class="textoProgresso">Progresso:</span>' + item.innerHTML;
+							}
+						}
+					}catch(err) {
+					}
+					
+					try{
+						// POPULA COMBOS JÁ RESPONDIDAS
+						var combosContrato = document.getElementsByClassName('dropdown');
+						for (var i=0; i<combosContrato.length; i++) {
+							var nomeVariavel = combosContrato[i].id;
+							var nomeCombo = combosContrato[i].id;
+							if ( nomeVariavel.length > 1 ){
+								nomeVariavel = nomeVariavel.replace('combo', 'var');
+								nomeSpan = nomeVariavel.replace('var', 'span');
+								nomeBotao = nomeVariavel.replace('var', 'botao');
+								var valorVariavel = document.getElementById(nomeVariavel).value;
+								if ( valorVariavel.length > 0 ){
+									if ( valorVariavel == 'ID' ){
+										document.getElementById(nomeSpan).innerHTML = 'Carteira de Identidade (RG)';
+									}else if ( valorVariavel == 'IDF' ){
+										document.getElementById(nomeSpan).innerHTML = 'Identidade Funcional';
+									}else if ( valorVariavel == 'CTPS' ){
+										document.getElementById(nomeSpan).innerHTML = 'Carteira de Trabalho (CTPS)';
+									}else if ( valorVariavel == 'CNH' ){
+										document.getElementById(nomeSpan).innerHTML = 'Carteira de Motorista (CNH)';
+									}else if ( valorVariavel == 'deposito' ){
+										document.getElementById(nomeSpan).innerHTML = 'Transferência ou Depósito';
+									}else{
+										document.getElementById(nomeSpan).innerHTML = valorVariavel;
+									}
+									document.getElementById(nomeBotao).style.visibility = 'visible';
+								}
+							}
+						}
+					}catch(err) {
+					}
+					
+					try{
+						// Somente para mobile
+						if ( ( window.innerWidth < 600 ) && ( window.innerHeight > 360 ) ){
+							// Array de perguntas (Modais) que tem dicas 
+							var arrayLength = perguntas.length;
+							for (var i = 0; i < arrayLength; i++) {
+								// Try / Catch adicionado porque o modal pode ainda não ter sido carregado
+								var textoInterno = "" + document.getElementById(perguntas[i]).innerHTML;
+								if (textoInterno.indexOf("textoVerPrevia") == -1){
+									if (textoInterno.indexOf("wrapper-demo") == -1){
+										document.getElementById(perguntas[i]).innerHTML += '<div style="margin-top: 25px;"></div><div id="dica'+perguntas[i]+'" name="dica'+perguntas[i]+'" class="botaoVerPrevia rwd-break-small-screen" onclick="abrirDica(\''+perguntas[i]+'\');" style="box-shadow: rgba(0, 0, 0, 0.6) 2px 3px 4px;border-top-left-radius: 3px;border-top-right-radius: 0px;width: 45px;bottom: 28%;margin-left: 20px;height: 45px;left: unset;right: 0px;border-bottom-left-radius: 3px;background-color: rgb(0 145 137);"><p class="cw_opener-text" style="color: #fff;margin: 0px;position: relative;top: 0px;left: 0px;width: 142px;font-size: 15px;text-align: center;font-family: source-sans-pro, Helvetica, Arial, sans-serif, sans-serif;font-weight: 300;"><img src="https://www.99contratos.com.br/imagens/hint.png" width=25 height=25 alt="informações úteis" style="width: 25px;top: 0px;float: left;margin-top: 10px;margin-left: 10px; display: inline-block;"></p></div>';
+									}else{
+										document.getElementById(perguntas[i]).innerHTML += '<div style="margin-top: 25px;"></div><div id="dica'+perguntas[i]+'" name="dica'+perguntas[i]+'" class="botaoVerPrevia rwd-break-small-screen" onclick="abrirDica(\''+perguntas[i]+'\');" style="box-shadow: rgba(0, 0, 0, 0.6) 2px 3px 4px;border-top-left-radius: 3px;border-top-right-radius: 0px;width: 45px;bottom: 28%;margin-left: 20px;height: 45px;left: unset;right: 0px;border-bottom-left-radius: 3px;background-color: rgb(0 145 137);"><p class="cw_opener-text" style="color: #fff;margin: 0px;position: relative;top: 0px;left: 0px;width: 142px;font-size: 15px;text-align: center;font-family: source-sans-pro, Helvetica, Arial, sans-serif, sans-serif;font-weight: 300;"><img src="https://www.99contratos.com.br/imagens/hint.png" width=25 height=25  alt="informações úteis" style="width: 25px;top: 0px;float: left;margin-top: 10px;margin-left: 10px; display: inline-block;"></p></div>';
+										var comboId = document.getElementById(perguntas[i]).getElementsByClassName("wrapper-dropdown-3")[0].id;
+										var dd = new DropDown( $('#'+comboId) );
+										$(document).click(function() {
+											// all dropdowns
+											$('.wrapper-dropdown-3').removeClass('active');
+										});
+									}
+								}
+							}
+						}
+					}catch(err){
+					}
+					proxima_pergunta(perguntaAnterior, proximaPergunta);
+				}
+			});	
+		}else{
+			try{
+				document.getElementById('perguntaDesabilitar1').style.pointerEvents = 'auto';
+				document.getElementById('perguntaDesabilitar2').style.pointerEvents = 'auto';
+			}catch(err) {
+			}
+			try{
+				document.getElementById('small-loading').innerHTML = '';
+			}catch(err) {
+			}
+			proxima_pergunta(perguntaAnterior, proximaPergunta);
+		}		
+	}
+
+	$(window).on('load', function(){
+		try{
+			var percentuais = document.getElementsByClassName('percentual');
+			for (var i = 0; i < percentuais.length; ++i) {
+				var item = percentuais[i]; 
+				var texto = item.innerHTML;
+				if ( item.innerHTML.indexOf('Progresso:') == -1 ){
+					item.innerHTML = '<span class="textoProgresso">Progresso:</span>' + item.innerHTML;
+				}
+			}
+		}catch(err) {
+		}	
+	});	
+
+	
+	function verificaEnterAdicionaFormularioPerguntas(e, perguntaAnterior, proximaPergunta, nomeArquivoPerguntas)
+	{		
+		if (e.keyCode == 13) {
+			try{
+				document.getElementById('small-loading').innerHTML = '<img src="https://www.99contratos.com.br/imagens/small-loading.gif" alt="Logotipo" style="width: 50px; display:  inline-block; position:  absolute; bottom: 90px; right: 50px;">';
+			}catch(err) {
+			}
+						
+			jaCarregado = false;
+			for (var i = 0; i < perguntasCarregadas.length; i++) {
+				if (perguntasCarregadas[i] == nomeArquivoPerguntas) {	
+					jaCarregado = true;
+				}
+			}
+		
+			if ( ! jaCarregado ){
+				perguntasCarregadas[perguntasCarregadasContador] = nomeArquivoPerguntas;
+				perguntasCarregadasContador = perguntasCarregadasContador + 1;	
+				jQuery.ajax({
+					url: document.location.origin + "/perguntas/" + nomeArquivoPerguntas,
+					data:'',
+					type: "POST",
+					success:function(data){
+						var formularioPeguntas = document.getElementById('myModal');
+						formularioPeguntas.innerHTML += data;
+
+						// Combos
+						var cusid_ele = document.getElementsByClassName('wrapper-dropdown-3');
+						for (var i = 0; i < cusid_ele.length; ++i) {
+							var item = cusid_ele[i];  
+							var nome = "#" + item.id;
+							var dd = new DropDown( $("#"+item.id) );
+							$(document).click(function() {
+								// all dropdowns
+								$('.wrapper-dropdown-3').removeClass('active');
+							});
+						}
+
+						// Máscaras
+						// CPF
+						cusid_ele = document.getElementsByClassName('inputPerguntas');
+						for (var i = 0; i < cusid_ele.length; ++i) {
+							var item = cusid_ele[i];  
+							// CPF
+							if ( item.id.indexOf("CPF") !=-1) {
+								$("#"+item.id).mask("999.999.999-99",{placeholder:" "});
+							}
+							// CPF
+							if ( item.id.indexOf("cpf") !=-1) {
+								$("#"+item.id).mask("999.999.999-99",{placeholder:" "});
+							}
+							// CNPJ
+							if ( item.id.indexOf("CNPJ") !=-1) {
+								$("#"+item.id).mask("99.999.999/9999-99",{placeholder:" "});
+							}
+							// DATA
+							if ( item.id.indexOf("data") !=-1) {
+								if ( item.id.indexOf("Comodatario") ==-1){
+									$("#"+item.id).mask("99/99/9999",{placeholder:" "});
+								}
+							}
+							// DATA
+							if ( item.id.indexOf("placaVeiculo") !=-1) {
+								$("#"+item.id).mask("aaa-9999",{placeholder:" "});
+							}
+							
+							// VALOR
+							if ( window.innerWidth > 600 ){
+								if ( item.id.indexOf("valor") !=-1) {
+									$("#"+item.id).maskMoney({thousands:'.',decimal:','});
+								}
+								if ( item.id.indexOf("salario") !=-1) {
+									$("#"+item.id).maskMoney({thousands:'.',decimal:','});
+								}
+								// ALGUMAS MULTAS NAO TEM DECIMAL!
+								var endereco = "" + window.location;
+								if ( endereco.toLowerCase().indexOf("contrato-locacao-residencial")  > 0){
+								}else if ( endereco.toLowerCase().indexOf("contrato-locacao-comercial")  > 0){
+								}else if ( endereco.toLowerCase().indexOf("contrato-locacao-veiculo")  > 0){
+								}else if ( endereco.toLowerCase().indexOf("contrato-locacao-vaga-garagem")  > 0){
+								}else if ( endereco.toLowerCase().indexOf("contrato-arrendamento-rural")  > 0){
+								}else if ( endereco.toLowerCase().indexOf("contrato-compra-e-venda-imovel-gaveta")  > 0){
+								}else if ( endereco.toLowerCase().indexOf("contrato-locacao-bem-movel")  > 0){
+								}else if ( endereco.toLowerCase().indexOf("contrato-prestacao-servico-pf")  > 0){
+								}else if ( endereco.toLowerCase().indexOf("contrato-promessa-compra-venda")  > 0){
+								}else if ( endereco.toLowerCase().indexOf("contrato-promessa-compra-e-venda-imovel")  > 0){
+								}else if ( endereco.toLowerCase().indexOf("contrato-promessa-compra-e-venda-terreno")  > 0){
+								}else if ( endereco.toLowerCase().indexOf("contrato-salao-parceiro")  > 0){
+								}else if ( endereco.toLowerCase().indexOf("contrato-empreitada")  > 0){
+								}else if ( endereco.toLowerCase().indexOf("contrato-compra-venda-veiculo")  > 0){
+								}else if ( endereco.toLowerCase().indexOf("contrato-compra-venda-estabelecimento-comercial")  > 0){
+								}else{
+									if ( item.id.indexOf("multa") !=-1) {
+										$("#"+item.id).maskMoney({thousands:'.',decimal:','});
+									}
+								}
+							}
+						}
+						try{
+							document.getElementById('perguntaDesabilitar1').style.pointerEvents = 'auto';
+							document.getElementById('perguntaDesabilitar2').style.pointerEvents = 'auto';
+						}catch(err) {
+						}
+						try{
+							document.getElementById('small-loading').innerHTML = '';
+						}catch(err) {
+						}
+						proxima_pergunta(perguntaAnterior, proximaPergunta);
+					}
+				});	
+			}else{
+				try{
+					document.getElementById('perguntaDesabilitar1').style.pointerEvents = 'auto';
+					document.getElementById('perguntaDesabilitar2').style.pointerEvents = 'auto';
+				}catch(err) {
+				}
+				try{
+					document.getElementById('small-loading').innerHTML = '';
+				}catch(err) {
+				}
+				proxima_pergunta(perguntaAnterior, proximaPergunta);
+			}
+		}
+	}
+	
+	function adicionaConcordanciasPerguntas(tipoContrato){
+		try{
+			var tag = document.createElement("script");
+			tag.src = document.location.origin + "/scriptPerguntas/" + tipoContrato;
+			document.getElementsByTagName("head")[0].appendChild(tag);
+		}catch(err) {
+			$.ajax({ 	url: document.location.origin + '/manual/registraErroJavascript.php',
+						data: {dados: err.message + ' url erro: ' + window.location.href + ' | linha: ' + 'ERRO CARREGANDO JAVASCRIPT' + ' | Endereco browser: ' + window.location.href + ' | Resolucao: nd' + ' | Browser: ' + 'nd'},
+						type: 'POST',
+						success: function(output) {
+				}
+			});
+		}	
+	}	
+
+	function abrirDica(pergunta){
+		var arrayLength = perguntas.length;
+		for (var i = 0; i < arrayLength; i++) {
+			if ( perguntas[i] == pergunta ){
+				var dica = dicas[i];
+				dica = dica.replace("\n\n", "<br><br>");
+				dica = dica.replace("\n\n", "<br><br>");
+				dica = dica.replace("\n\n", "<br><br>");
+				dica = dica.replace("\n\n", "<br><br>");
+				
+				// Tamanho dinâmico do modal de acordo com o tamanho da dica
+				if ( dica.length < 371 ){
+					document.getElementById("dicaModal").style.top = '10%';
+					document.getElementById("dicaModal").style.height = '300px';
+				}else if ( dica.length < 421 ){
+					document.getElementById("dicaModal").style.top = '10%';
+					document.getElementById("dicaModal").style.height = '380px';
+				}else{
+					if ( window.innerHeight < 600 ){
+						document.getElementById("dicaModal").style.top = '10%';
+						document.getElementById("dicaModal").style.height = '480px';
+					}else{
+						document.getElementById("dicaModal").style.top = '10%';
+						document.getElementById("dicaModal").style.height = '480px';
+					}
+
+				}
+				document.getElementById("textoDicaPerguntaMobile").innerHTML = dica;
+			}
+		}
+		document.getElementById("fundoDicaMobile").className = '';
+		document.getElementById("dicaModal").className = 'modal-content-rapido';
+	}
+
+	function fechaDica(){
+		document.getElementById("fundoDicaMobile").className = 'hideMe';
+		document.getElementById("dicaModal").className = 'modal-content-rapido hideMe';
+	}
+	
+	// Carga das dicas mobile.
+	$(window).on('load', function(){
+		try{
+			// Somente para mobile
+			if ( ( window.innerWidth < 600 ) && ( window.innerHeight > 360 ) ){
+				// Array de perguntas (Modais) que tem dicas 
+				var arrayLength = perguntas.length;
+				for (var i = 0; i < arrayLength; i++) {
+					// Try / Catch adicionado porque o modal pode ainda não ter sido carregado
+					var textoInterno = "" + document.getElementById(perguntas[i]).innerHTML;
+					if (textoInterno.indexOf("textoVerPrevia") == -1){
+						if (textoInterno.indexOf("wrapper-demo") == -1){
+							document.getElementById(perguntas[i]).innerHTML += '<div style="margin-top: 25px;"></div><div id="dica'+perguntas[i]+'" name="dica'+perguntas[i]+'" class="botaoVerPrevia rwd-break-small-screen" onclick="abrirDica(\''+perguntas[i]+'\');" style="box-shadow: rgba(0, 0, 0, 0.6) 2px 3px 4px;border-top-left-radius: 3px;border-top-right-radius: 0px;width: 45px;bottom: 28%;margin-left: 20px;height: 45px;left: unset;right: 0px;border-bottom-left-radius: 3px;background-color: rgb(0 145 137);"><p class="cw_opener-text" style="color: #fff;margin: 0px;position: relative;top: 0px;left: 0px;width: 142px;font-size: 15px;text-align: center;font-family: source-sans-pro, Helvetica, Arial, sans-serif, sans-serif;font-weight: 300;"><img src="https://www.99contratos.com.br/imagens/hint.png" width=25 height=25  alt="informações úteis" style="width: 25px;top: 0px;float: left;margin-top: 10px;margin-left: 10px; display: inline-block;"></p></div>';
+						}else{
+							document.getElementById(perguntas[i]).innerHTML += '<div style="margin-top: 25px;"></div><div id="dica'+perguntas[i]+'" name="dica'+perguntas[i]+'" class="botaoVerPrevia rwd-break-small-screen" onclick="abrirDica(\''+perguntas[i]+'\');" style="box-shadow: rgba(0, 0, 0, 0.6) 2px 3px 4px;border-top-left-radius: 3px;border-top-right-radius: 0px;width: 45px;bottom: 28%;margin-left: 20px;height: 45px;left: unset;right: 0px;border-bottom-left-radius: 3px;background-color: rgb(0 145 137);"><p class="cw_opener-text" style="color: #fff;margin: 0px;position: relative;top: 0px;left: 0px;width: 142px;font-size: 15px;text-align: center;font-family: source-sans-pro, Helvetica, Arial, sans-serif, sans-serif;font-weight: 300;"><img src="https://www.99contratos.com.br/imagens/hint.png" width=25 height=25  alt="informações úteis" style="width: 25px;top: 0px;float: left;margin-top: 10px;margin-left: 10px; display: inline-block;"></p></div>';
+							var comboId = document.getElementById(perguntas[i]).getElementsByClassName("wrapper-dropdown-3")[0].id;
+							var dd = new DropDown( $('#'+comboId) );
+							$(document).click(function() {
+								// all dropdowns
+								$('.wrapper-dropdown-3').removeClass('active');
+							});
+						}
+					}
+				}
+			}
+		}catch(err){
+		}
+	});
